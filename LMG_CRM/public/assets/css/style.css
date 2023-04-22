@@ -1,0 +1,15 @@
+input#appoinment_date {
+    width: auto;
+}
+
+input#appoinment_time {
+    width: auto;
+}
+
+select#followup_area {
+    width: auto;
+}
+
+textarea.div-remarks.form-control {
+    width: 50%;
+}
