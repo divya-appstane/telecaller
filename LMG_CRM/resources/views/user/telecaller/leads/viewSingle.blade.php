@@ -120,6 +120,7 @@
         {{-- <script src="{{env('USER_ASSETS')}}vendors/datatables/jquery.dataTables.min.js"></script> --}}
         {{-- <script src="{{env('USER_ASSETS')}}vendors/datatables/dataTables.bootstrap.min.js"></script> --}}
         <script src="{{env('USER_ASSETS')}}vendors/jquery-validation/jquery.validate.min.js"></script>
+        <script src="{{env('USER_ASSETS')}}vendors/jquery-validation/additional-methods.min.js"></script>
         <script>
             $(document).ready(function(){
                 jQuery.validator.addMethod("phoneIND", function(contact_number, element) {
@@ -220,10 +221,6 @@
                             cache: false,
                             dataType:"json",
                             success: function(response) {
-                                // console.log(response);
-                                // $('html,body').animate({
-                                //     scrollTop: $('.updateStatus').offset().top - 250
-                                // },500);
                                 Swal.fire({
                                     title: response.status,
                                     text: response.message,
@@ -231,17 +228,8 @@
                                     showConfirmButton: false,
                                     showCancelButton: false,
                                     showCloseButton: false,
-                                    showConfirmButton: false,
-                                    showCancelButton: false,
-                                    showCloseButton: false,
                                     timer: swalModelTimeOut
                                 });
-                                // if(response.status == 'success')
-                                //     $('.updateStatus').addClass('alert alert-success');
-                                // else 
-                                //     $('.updateStatus').addClass('alert alert-error');
-
-                                // $('.updateStatus').html(response.message);
 
                                 setTimeout(() => {
                                     window.location.href = `{{route('telecaller.leads.view.allLeads')}}`;

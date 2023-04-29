@@ -28,7 +28,7 @@ input[type=number] {
 }
 </style>
 @endpush
-<div class="content">
+<div class="content" @if(Session::get("timer")) style="margin-left: 0% !important" @endif>
     <div class="main">
         <div class="page-header">
             <h4 class="page-title"></h4>

@@ -29,12 +29,9 @@ class TelecallerLeadsController extends Controller
      */
     public function index()
     {
-        //
-        // dd(session()->all());
         $title = "Telecaller | View all Leads";
         $empusrid = session()->get('empusrid');
         $all_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [1,2,4,5,6,7,8,9])->get();
-        // dd($all_leads->toArray());
         return view('user.telecaller.leads.listAllLeads', compact('title', 'all_leads'));
     }
 
@@ -43,7 +40,6 @@ class TelecallerLeadsController extends Controller
      */
     public function getPendingLeads()
     {
-        //
         $title = "Telecaller | View Pending Leads";
         $empusrid = session()->get('empusrid');
         if(session()->exists('is_admin')){
@@ -51,7 +47,6 @@ class TelecallerLeadsController extends Controller
         } else {
             $pending_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [1])->get();
         }
-        // dd($pending_leads->toArray());
         return view('user.telecaller.leads.listPendingLeads', compact('title', 'pending_leads'));
     }
 
@@ -243,7 +238,6 @@ class TelecallerLeadsController extends Controller
      */
     public function getLeadCalledPage($id)
     {
-        //
         $lead_id = base64_decode($id);
         $title = "Telecaller | Lead call Engagements";
         $single_lead = UploadLeads::with('getLeadCategory')->whereId($lead_id)->first();
@@ -253,12 +247,6 @@ class TelecallerLeadsController extends Controller
         return view('user.telecaller.leads.telecallerCall', compact('title', 'single_lead', 'all_categories', 'all_areas'));
     }
 
-    public function createsession()
-    {
-        Session::put('timer',date("Y-m-d H:i:s"));
-        echo Session::get('timer');
-        exit;
-    }
 
     /**
      * Display the specified resource.
@@ -346,7 +334,6 @@ class TelecallerLeadsController extends Controller
                     // Validation failed need to send message
                     $status = "error";
                     $message = $message;
-                    goto tag;
                 } else {
                     // Validation passed
     
@@ -406,8 +393,6 @@ class TelecallerLeadsController extends Controller
                         $status = 2;
                         
                         $last_remark = "Contact number updated from $lead_contact_number to $number_change.";
-                        // $update_lead = "update tbl_upload_leads set contact_per_name ='$name_change', contact_number='$number_change' where id='$upload_lead_id'";
-                        // mysqli_query($objdb->link_id,$update_lead);
                         // UPDATE CONTACT PERSON NAME AND NUMBER
                         $leadData->contact_per_name = $name_change;
                         $leadData->contact_number = $number_change;
@@ -506,10 +491,6 @@ class TelecallerLeadsController extends Controller
                         } else {
                             // NO Employee found having BDF designation THROW AN EXCEPTION HERE
                         }
-                        // print_r($empid);
-                        // print_r($areaWiseEmpids);
-                        // print_r($added_for);
-                        // die;
                         
                         if($appointment_date == ""){
                             $appointment_date = date("Y-m-d",strtotime("+2 days"));
@@ -610,6 +591,9 @@ class TelecallerLeadsController extends Controller
                     }
                     // echo $update_lead; die;
                     // mysqli_query($objdb->link_id,$update_lead);
+
+                    Session::forget('timer');
+                    Session::forget("redirecturl");
                     
                     $status = "success";
                     $message = "Call engagement recods has been saved successfully.";
@@ -625,7 +609,6 @@ class TelecallerLeadsController extends Controller
             $message = "Unable to update the lead record as of now.".$e->getMessage();
             DB::rollback();
         }
-        tag: 
         return response()->json([
             'status' => $status,
             'message' => $message,
@@ -758,4 +741,11 @@ class TelecallerLeadsController extends Controller
         return $d && $d->format($format) === $date ? $date : '';
     }
     
+
+    public function createSession(Request $request)
+    {
+        Session::put("timer", date('H:i:s'));
+        Session::put("redirecturl", $request['sucurl']);
+        return Session::get("timer");
+    }
 }

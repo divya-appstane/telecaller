@@ -92,37 +92,37 @@
                                             <div class="row mb-9 mb-2">
                                                 <label for="last_nm" class="col-sm-3 col-form-label control-label">Last Name</label>
                                                 <div class="col-md-6">
-                                                    <input type="text" class="form-control" name="last_nm" id="last_nm" placeholder="Enter your first name" value="{{old('last_nm') ?? ucwords(strtolower($user->last_nm)) }}"/>
+                                                    <input type="text" class="form-control" name="last_nm" id="last_nm" placeholder="Enter your last name" value="{{old('last_nm') ?? ucwords(strtolower($user->last_nm)) }}"/>
                                                 </div>
                                             </div>
                                             <div class="row mb-9 mb-2">
                                                 <label for="emailid" class="col-sm-3 col-form-label control-label">Email</label>
                                                 <div class="col-md-6">
-                                                    <input type="email" class="form-control" name="emailid" id="emailid" placeholder="Enter your first name" value="{{old('emailid') ?? $user->emailid }}" disabled="" />
+                                                    <input type="email" class="form-control" name="emailid" id="emailid" placeholder="Enter your email" value="{{old('emailid') ?? $user->emailid }}" disabled="" />
                                                 </div>
                                             </div>
                                             <div class="row mb-9 mb-2">
                                                 <label for="mobnum" class="col-sm-3 col-form-label control-label">Mobile Number</label>
                                                 <div class="col-md-6">
-                                                    <input type="text" class="form-control" name="mobnum" id="mobnum" placeholder="Enter your first name" value="{{old('mobnum') ?? $user->mobnum }}" disabled="" />
+                                                    <input type="text" class="form-control" name="mobnum" id="mobnum" placeholder="Enter your mobile number" value="{{old('mobnum') ?? $user->mobnum }}" disabled="" />
                                                 </div>
                                             </div>
                                             <div class="row mb-9 mb-2">
                                                 <label for="birthdate" class="col-sm-3 col-form-label control-label">Birth date</label>
                                                 <div class="col-md-6">
-                                                    <input type="text" class="form-control" name="birthdate" id="birthdate" placeholder="Enter your first name" value="{{old('birthdate') ?? $user->birthdate }}" disabled="" />
+                                                    <input type="text" class="form-control" name="birthdate" id="birthdate" placeholder="Enter your date of birth" value="{{old('birthdate') ?? $user->birthdate }}" disabled="" />
                                                 </div>
                                             </div>
                                             <div class="row mb-9 mb-2">
                                                 <label for="address" class="col-sm-3 col-form-label control-label">Address</label>
                                                 <div class="col-md-6">
-                                                    <input type="text" class="form-control" name="address" id="address" placeholder="Enter your first name" value="{{old('address') ?? $user->address }}" disabled="" />
+                                                    <input type="text" class="form-control" name="address" id="address" placeholder="Enter your address" value="{{old('address') ?? $user->address }}" disabled="" />
                                                 </div>
                                             </div>
                                             <div class="row mb-9 mb-2">
                                                 <label for="pincode" class="col-sm-3 col-form-label control-label">Pincode</label>
                                                 <div class="col-md-6">
-                                                    <input type="text" class="form-control" name="pincode" id="pincode" placeholder="Enter your first name" value="{{old('pincode') ?? $user->pincode }}" disabled="" />
+                                                    <input type="text" class="form-control" name="pincode" id="pincode" placeholder="Enter your pincode" value="{{old('pincode') ?? $user->pincode }}" disabled="" />
                                                 </div>
                                             </div>
                                             

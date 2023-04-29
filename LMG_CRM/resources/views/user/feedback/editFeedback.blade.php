@@ -16,14 +16,14 @@
             <div class="breadcrumb">
                <span class="me-1 text-gray"><i class="feather icon-home"></i></span>
                <div class="breadcrumb-item"><a href="{{route(session()->get('load_dashboard').'.dashboard')}}"> Dashboard </a></div>
-               <div class="breadcrumb-item"><a href="javascript:void(0)"> Area </a></div>
-               <div class="breadcrumb-item"><a href="{{route('area.addArea')}}"> Add new area </a></div>
+               <div class="breadcrumb-item"><a href="javascript:void(0)"> Feedback </a></div>
+               <div class="breadcrumb-item"><a href="{{route('feedback.editFeedback', ['id' => base64_encode($singlefeedback->feedback_id)])}}"> Update feedback </a></div>
             </div>
         </div>
         <div class="card">
             <div class="updateStatus"></div>
             <div class="card-body">
-                <h4>Add Area</h4><br/>
+                <h4>Add CRM Feedback</h4><br/>
                 @if (session()->has('failures'))
 
                     <table class="table table-danger">
@@ -53,47 +53,61 @@
                     </table>
 
                 @endif
-                <form  id="addAreaForm" name="addAreaForm" novalidate enctype="multipart/form-data" autocomplete="off">
+                <form  id="addFeedbackForm" name="addFeedbackForm" novalidate enctype="multipart/form-data" autocomplete="off">
                     @csrf
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="col-md-3">
-                            <label for="area_name" class="form-label">Area Name<span class="text-danger">&nbsp;*</span></label>
+                            <label for="question" class="form-label">Question<span class="text-danger">&nbsp;*</span></label>
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="basic-addon1"><i class="icon-map-pin feather"></i></span>
-                                <input type="text" class="form-control" id="area_name" name="area_name" placeholder="Enter area name" />
+                                <span class="input-group-text" id="basic-addon1"><i class="icon-help-circle feather"></i></span>
+                                <textarea class="form-control" id="question" name="question" placeholder="Enter question">{{$singlefeedback->question}}</textarea>
                             </div>
                         </div>
                     </div>
-                    <span class="area_name error mb-2"></span>
+                    <span class="question error mb-2"></span>
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="col-md-3">
-                            <label for="surrounding_area_id" class="form-label">Surrounding Area<span class="text-danger">&nbsp;*</span></label>
+                            <label for="question_type" class="form-label">Question Type<span class="text-danger">&nbsp;*</span></label>
                             <div class="input-group mb-3">
-                                @php $cnt = 0; @endphp
-                                @foreach($all_areas as $area)
-                                    @php $cnt++; @endphp
-                                    <input type="checkbox" name="surrounding_area_id[]" id="surrounding_area_id[]" value="{{$area->id}}"> &nbsp;{{$area->area_name}} &nbsp;&nbsp;
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="col-md-3">
-                            <label for="isactive" class="form-label">Active<span class="text-danger">&nbsp;*</span></label>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text" id="basic-addon1"><i class="icon-clock feather"></i></span>
-                                <select class="form-control" id="isactive" name="isactive">
+                                <span class="input-group-text" id="basic-addon1"><i class="icon-help-circle feather"></i></span>
+                                <select class="form-control" id="question_type" name="question_type">
                                     <option value="">--SELECT--</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
+                                    <option value="Yes/No" @if($singlefeedback->question_type == "Yes/No") selected @endif>Yes/No</option>
+                                    <option value="Rating" @if($singlefeedback->question_type == "Rating") selected @endif>Rating</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                    <span class="isactive error mb-2"></span>
+                    <span class="question_type error mb-2"></span>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="col-md-3">
+                            <label for="question_display" class="form-label">Question Display<span class="text-danger">&nbsp;*</span></label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="basic-addon1"><i class="icon-eye feather"></i></span>
+                                <select class="form-control" id="question_display" name="question_display" onchange="get_last_order()">
+                                    <option value="">--SELECT--</option>
+                                    <option value="Feedback 1" @if($singlefeedback->question_display == "Feedback 1") selected @endif>1st Call</option>
+                                    <option value="Feedback 2" @if($singlefeedback->question_display == "Feedback 2") selected @endif>After 15 days 2nd Call</option>
+                                    <option value="Feedback 3" @if($singlefeedback->question_display == "Feedback 3") selected @endif>After 15 days 3nd Call</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="question_display error mb-2"></span>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="col-md-3">
+                            <label for="question_order" class="form-label">Question Order<span class="text-danger">&nbsp;*</span></label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="basic-addon1"><i class="icon-help-circle feather"></i></span>
+                                <input type="number" id="question_order" name="question_order" class="form-control" value="{{$singlefeedback->question_no}}">
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="feedbackid" id="feedbackid" value="{{$singlefeedback->feedback_id}}">
+                    <span class="question_order error mb-2"></span>
                     
                     <div class="col-12 mt-2">
-                        <button type="button" class="btn btn-primary mr-3" id="add_new_area">Save</button>
+                        <button type="button" class="btn btn-primary mr-3" id="add_new_feedback">Save</button>
                         <a onclick="javascript: history.back()" class="btn btn-warning ml-2">Go Back</a>
                     </div>
                 </form>
@@ -110,22 +124,34 @@
                     return !element.files[0] || (element.files[0].size <= limit);
                 }, 'File size must be less than {0} MB');
 
-                $('#addAreaForm').validate({
+                $('#addFeedbackForm').validate({
                     ignore: "ignore",
                     rules: {
-                        area_name: {
+                        question: {
                             required: true,
                         },
-                        isactive:{
+                        question_type:{
                             required: true,
                         },
+                        question_display: {
+                            required : true,
+                        },
+                        question_order : {
+                            required : true,
+                        }
                     },
                     messages: {
-                        area_name: {
-                            required: "Area name is required."
+                        question: {
+                            required: "Question field is required."
                         },
-                        isactive: {
-                            required: "Please select atleast one status.",
+                        question_type: {
+                            required: "Please select atleast one question type.",
+                        },
+                        question_display: {
+                            required: "Please select atleast one question status.",
+                        },
+                        question_order: {
+                            required: "Question Order field is required.",
                         },
                     },
                     highlight: function (element, errorClass, validClass) {
@@ -135,24 +161,28 @@
                         $(element).removeClass('is-invalid');
                     },
                     errorPlacement: function(error, element) {
-                        if(element.attr("name") == "area_name") {
-                            $('.area_name').html(error);
-                        } else if(element.attr("name") == "isactive") {
-                            $('.isactive').html(error);
+                        if(element.attr("name") == "question") {
+                            $('.question').html(error);
+                        } else if(element.attr("name") == "question_type") {
+                            $('.question_type').html(error);
+                        } else if(element.attr("name") == "question_display") {
+                            $('.question_display').html(error);
+                        } else if(element.attr("name") == "question_order") {
+                            $('.question_order').html(error);
                         } else {
                             error.insertAfter(element);
                         }
                     }
                 });
 
-                $('#add_new_area').on('click', function() {
-                    const valid = $('#addAreaForm').valid();
+                $('#add_new_feedback').on('click', function() {
+                    const valid = $('#addFeedbackForm').valid();
 
                     if(valid){
-                        var fd = new FormData($('#addAreaForm')[0]);
+                        var fd = new FormData($('#addFeedbackForm')[0]);
 
                         $.ajax({
-                            url:"{{route('area.storeArea')}}",  
+                            url:"{{route('feedback.updateFeedback')}}",  
                             method:"POST",  
                             data:fd,  
                             contentType:false, 
@@ -170,7 +200,7 @@
                                 });
 
                                 setTimeout(() => {
-                                    window.location.href = `{{route('area.viewArea')}}`;
+                                    window.location.href = `{{route('feedback.viewFeedback')}}`;
                                 }, pageReloadTimeOut);
                             },
                             error: function(errors) {
@@ -194,6 +224,25 @@
                     }
                 });
             });
+
+
+            function get_last_order(){
+				
+				var question_display = $("#question_display").val();
+				
+				$.ajax({
+					
+					type: "POST",
+					url: `{{route('feedback.changeOrder')}}`,
+					data: {question_display:question_display},
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+					success: function(data){
+						$("#question_order").val(data);
+					}
+					
+				});
+				
+			}
 
         </script>
     @endpush

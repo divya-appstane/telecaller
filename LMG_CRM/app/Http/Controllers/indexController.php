@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Exception;
+use Session;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -278,6 +279,7 @@ class indexController extends Controller
     {
         //
         session()->flush();
+        Session::forget("timer");
         return redirect()->route('user.viewLoginPage');
     }
 

@@ -15,6 +15,7 @@ use App\Models\CRMFeedbackMaster;
 use App\Models\FollowUpFeedback;
 use Exception;
 use Route;
+use Session;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,7 +35,7 @@ class CrmLeadsController extends Controller
         // dd(session()->all());
         $title = "CRM | View all Leads";
         $empusrid = session()->get('empusrid');
-        $all_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [10,11,12,13,14,15,16,17,18])->orderby('id','DESC')->get();
+        $all_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [10,11,12,13,14,15,16,17,18,19,20])->orderby('id','DESC')->get();
         return view('user.crm.leads.listAllLeads', compact('title', 'all_leads'));
     }
 
@@ -74,9 +75,13 @@ class CrmLeadsController extends Controller
             {
                 $pending_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [15,16,17])->orderby('id','DESC')->get();
             }
+            if(Route::getCurrentRoute()->getName() == "crm.leads.view.pendingLeadsRegister")
+            {
+                $pending_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [19,20])->orderby('id','DESC')->get();
+            }
             if(Route::getCurrentRoute()->getName() == "crm.leads.view.pendingLeadsNotIn")
             {
-                $pending_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [11])->orderby('id','DESC')->get();
+                $pending_leads = UploadLeads::with('getLeadStatus')->where('added_for', $empusrid)->whereIn('lead_status', [11,18])->orderby('id','DESC')->get();
             }
         }
         // dd($pending_leads->toArray());
@@ -125,6 +130,16 @@ class CrmLeadsController extends Controller
         $all_areas = AreaMaster::where('isactive', 1)->get();
         $feedback_data_notin = CRMFeedbackMaster::where('question_display', 'Not Interested')->orderBy('question_no','ASC')->get();
         return view('user.crm.leads.feedbackCallViewNotIntersted', compact('title', 'single_lead', 'all_categories', 'all_areas','feedback_data_notin'));
+    }
+
+    public function feedbackCallRegister($id)
+    {
+        $lead_id = base64_decode($id);
+        $title = "CRM | Feedback Call View Intersted";
+        $all_categories = Category::get();
+        $all_areas = AreaMaster::where('isactive', 1)->get();
+        $single_lead = UploadLeads::with('getLeadCategory')->whereId($lead_id)->first();
+        return view('user.crm.leads.feedbackCallViewRegister', compact('title', 'single_lead', 'all_categories', 'all_areas'));
     }
 
 
@@ -357,6 +372,7 @@ class CrmLeadsController extends Controller
                     $recall_date = date("Y-m-d",strtotime("+15 days"));
                     $recall_time = date("H:i:s",strtotime("11:00:00"));
 
+
                     $insert_followup = new LeadFollowUp();
                     $insert_followup->upload_lead_id = $lead_id;
                     $insert_followup->followup_added_by = $added_by;
@@ -430,7 +446,11 @@ class CrmLeadsController extends Controller
                     }
                 }
             }
+            Session::forget('timer');
+            Session::forget("redirecturl");
+
             DB::commit();
+           
             $status = "success";
             $message = "Followup completed successfully.";
             
@@ -574,8 +594,9 @@ class CrmLeadsController extends Controller
                     $appointment_date = NULL;
                     $appointment_time = NULL;
                     
-                    $recall_date = date("Y-m-d",strtotime("+7 days"));
+                    $recall_date = date("Y-m-d",strtotime("+15 days"));
                     $recall_time = date("H:i:s",strtotime("11:00:00"));
+
     
                     $insert_followup = new LeadFollowUp();
                     $insert_followup->upload_lead_id = $lead_id;
@@ -652,6 +673,9 @@ class CrmLeadsController extends Controller
                     }
                 }
             }
+            Session::forget('timer');
+            Session::forget("redirecturl"); 
+
             DB::commit();
             $status = "success";
             $message = "Followup completed successfully.";
@@ -791,7 +815,7 @@ class CrmLeadsController extends Controller
 
                 if($is_recall == "N")
                 {
-                    $status = 11;
+                    $status = 19;
                     $added_for = $added_by;
                     $appointment_date = NULL;
                     $appointment_time = NULL;
@@ -825,7 +849,7 @@ class CrmLeadsController extends Controller
                     $added_for = $this->get_next($empid,$last_crm_id);
                     $crm_id = $added_for;
 
-                    $recall_date = date("Y-m-d",strtotime("+7 days"));
+                    $recall_date = date("Y-m-d",strtotime("+30 days"));
                     $recall_time = date("H:i:s",strtotime("11:00:00"));
 
                     $insert_followup = new LeadFollowUp();
@@ -903,6 +927,9 @@ class CrmLeadsController extends Controller
                     }
                 } 
             }
+            Session::forget('timer');
+            Session::forget("redirecturl");
+
             DB::commit();
             $status = "success";
             $message = "Followup completed successfully.";
@@ -916,27 +943,6 @@ class CrmLeadsController extends Controller
             'message' => $message,
             'icon' => $status,
         ]);
-    }
-
-
-    //user defined function
-    function get_next($array, $key) {
-	
-        if (in_array($key, $array)){
-            $currentKey = current($array);
-            while ($currentKey !== null && $currentKey != $key) {
-               next($array);
-               $currentKey = current($array);
-            }
-            if(next($array) == ""){
-                return $array[0];
-            }else{
-                return current($array);
-            }
-        }else{
-          return $array[0];
-        }
-        
     }
 
     public function storenotin(Request $request): JsonResponse
@@ -1070,12 +1076,64 @@ class CrmLeadsController extends Controller
 
                 if($is_recall == "N" && $selintrested == "1")
                 {
+
+                    $getAllBDF = LMGEmployee::where([['designation',15],['offinfo', '2']])->select('empusrid')->get();
+
+                    $empid = array_map(function($n) { 
+                        return $n['empusrid']; 
+                    }, $getAllBDF->toArray());
+
+                    if(count($empid) > 1) 
+                    {
+                        $areaWiseEmpids = array();
+                        foreach($empid as $emp) {
+                            $getAreaWiseEmp = Territory2::where('agentcode', $emp)->first();
+                            if(!is_null($getAreaWiseEmp))
+                            {
+                                $areaWiseEmpids[] = $getAreaWiseEmp->agentcode;
+                            }
+                        }
+                        $getLastAssignedBDF = UploadLeads::whereNotNull('salesperson_id')->orderBy('added_datetime', 'DESC')->select('salesperson_id')->first();
+                        if(!is_null($getLastAssignedBDF)){
+                            $last_bdf_id = $getLastAssignedBDF->salesperson_id;
+                            if(count($areaWiseEmpids) > 1) 
+                            {
+                                $added_for = $this->get_next($areaWiseEmpids, $last_bdf_id);
+                            } 
+                            else if(count($areaWiseEmpids) == 1) 
+                            {
+                                $added_for = $areaWiseEmpids[0];
+                            } 
+                            else 
+                            {
+                                $added_for = $this->get_next($empid,$last_bdf_id);
+                            }
+                        } 
+                        else 
+                        {
+                            $added_for = ((count($areaWiseEmpids) > 1) ? $this->get_next($areaWiseEmpids, $areaWiseEmpids[0]) : ((count($areaWiseEmpids) == 1) ? $areaWiseEmpids[0] :  $this->get_next($empid,$empid[0])));
+                        }
+                    } 
+                    elseif (count($empid) == 1) 
+                    {
+                        $added_for = $empid[0];
+                    } 
+                    else 
+                    {
+                        // NO Employee found having BDF designation THROW AN EXCEPTION HERE
+                    }
+
                     $status = 6;
-                    $added_for = $salesperson_id;
+                    // $added_for = $salesperson_id;
+
+                  
                     
 
                     $recall_date = date("Y-m-d",strtotime("+7 days"));
+                    
                     $recall_time = date("H:i:s",strtotime("11:00:00"));
+
+
 
                     $insert_followup = new LeadFollowUp();
                     $insert_followup->upload_lead_id = $lead_id;
@@ -1111,13 +1169,15 @@ class CrmLeadsController extends Controller
                         $followup_id = $insert_followup->id;
                     }
 
-                    
                     $uploadLeadData = UploadLeads::whereId($lead_id)->first();
                     $uploadLeadData->call_date = $recall_date;
                     $uploadLeadData->call_time = $recall_time; 
                     $uploadLeadData->appointment_date = $appointment_date; 
                     $uploadLeadData->appointment_time = $appointment_time; 
-                    $uploadLeadData->lead_status = $status; 
+                    $uploadLeadData->lead_status = $status;
+                    $uploadLeadData->crm_id = NULL;
+                    $uploadLeadData->salesperson_id = $added_for;
+                    $uploadLeadData->added_for = $added_for;
                     $uploadLeadData->update();  
 
                     
@@ -1190,8 +1250,8 @@ class CrmLeadsController extends Controller
                     $insert_followup->is_sell_online = $online_selling;
                     $insert_followup->portal_name = $protal_name;
                     $insert_followup->want_to_register = $register;
-                    $insert_followup->appointment_date = $appointment_date;
-                    $insert_followup->appointment_time = $appointment_time;
+                    $insert_followup->appointment_date = $appoinment_date;
+                    $insert_followup->appointment_time = $appoinment_time;
                     $insert_followup->want_help = $help;
                     $insert_followup->query_remark = $query_remark;
                     $insert_followup->last_remark = $last_remark;
@@ -1216,9 +1276,14 @@ class CrmLeadsController extends Controller
                     $uploadLeadData = UploadLeads::whereId($lead_id)->first();
                     $uploadLeadData->call_date = $recall_date;
                     $uploadLeadData->call_time = $recall_time; 
-                    $uploadLeadData->appointment_date = $appointment_date; 
-                    $uploadLeadData->appointment_time = $appointment_time; 
-                    $uploadLeadData->lead_status = $status; 
+                    $uploadLeadData->appointment_date = $appoinment_date; 
+                    $uploadLeadData->appointment_time = $appoinment_time; 
+                    $uploadLeadData->lead_status = $status;
+                    $uploadLeadData->telecaller_id = $added_for; 
+                    $uploadLeadData->crm_id = NULL;
+                    $uploadLeadData->salesperson_id = NULL;
+                    $uploadLeadData->added_for = $added_for;
+
                     $uploadLeadData->update();  
 
                     
@@ -1253,6 +1318,9 @@ class CrmLeadsController extends Controller
                     }
                 }
             }
+            Session::forget('timer');
+            Session::forget("redirecturl"); 
+
             DB::commit();
             $status = "success";
             $message = "Followup completed successfully.";
@@ -1267,5 +1335,240 @@ class CrmLeadsController extends Controller
             'message' => $message,
             'icon' => $status,
         ]);
+    }
+
+    public function storeregister(Request $request): JsonResponse
+    {
+       
+        $inputs = $request->all();
+
+
+        DB::beginTransaction();
+        try{
+            $is_recall = $inputs['is_recall'];
+            $recall_date = $inputs['recall_date'];
+            $recall_time = $inputs['recall_time'];
+            $feedback_remarks = $inputs['feedback_remarks'];
+            $last_remark = $inputs['last_remark'];
+            $start_call_datetime = $inputs['start_call_datetime'];
+            $end_call_datetime = $inputs['end_call_datetime'];
+            $lead_id = $inputs['upload_lead_id'];
+
+
+            $sql_lead = UploadLeads::whereId($lead_id)->first();
+
+            $lead_area = $sql_lead->area;
+            $lead_contact_number = $sql_lead->contact_number;
+            $telecaller_id = $sql_lead->telecaller_id;
+            $salesperson_id = $sql_lead->salesperson_id;
+            
+
+            $sql_previous_followup = LeadFollowUp::where('upload_lead_id',$lead_id )->orderBy('created_at','DESC')->first();
+
+            
+            $added_by = session()->get('empusrid');
+
+            $message = "";
+
+            if($is_recall == "")
+            {
+                $message = "Please select yes or no.";
+            }
+
+            if($message != "")
+            {
+                $d = array(
+                    "status"=>"error",
+                    "message"=>$message
+                );
+            }
+            else
+            {
+                $previous_status = $sql_lead->lead_status;
+                $status = 0;
+                $salesperson_id = 0;
+                $added_for = $added_by;
+
+                if($recall_date == "")
+                {
+                    $recall_date = date("Y-m-d",strtotime("+1 days"));
+                }
+                else
+                {
+                    $recall_date = date("Y-m-d",strtotime($recall_date));
+                }
+                
+                if($recall_time == "")
+                {
+                    $recall_time = date("H:i:s",strtotime("11:00:00"));
+                }
+                else
+                {
+                    $recall_time = date("H:i:s",strtotime($recall_time));
+                }
+                
+                $datetime = date("Y-m-d H:i:s");
+
+                $first_conf = $sql_previous_followup->is_person;
+                $first_no_reason = $sql_previous_followup->first_no_reason;
+                $chat_now = $sql_previous_followup->chat_now;
+                $online_selling = $sql_previous_followup->is_sell_online;
+                $protal_name = $sql_previous_followup->portal_name;
+                $register = $sql_previous_followup->want_to_register;
+                $help = $sql_previous_followup->want_help;
+                $query_remark = $sql_previous_followup->query_remark;
+
+                if($is_recall == "Y")
+                {
+
+                    $status = 20;
+                    $added_for = $added_by;
+                
+                    
+                    $insert_followup = new LeadFollowUp();
+                    $insert_followup->upload_lead_id = $lead_id;
+                    $insert_followup->followup_added_by = $added_by;
+                    $insert_followup->followup_added_for = $added_for;
+                    $insert_followup->previous_status = $previous_status;
+                    $insert_followup->current_status = $status;
+                    $insert_followup->is_person = $first_conf;
+                    $insert_followup->first_no_reason = $first_no_reason;
+                    $insert_followup->chat_now = $chat_now;
+                    $insert_followup->is_sell_online = $online_selling;
+                    $insert_followup->portal_name = $protal_name;
+                    $insert_followup->want_to_register = $register;
+                    $insert_followup->appointment_date = NULL;
+                    $insert_followup->appointment_time = NULL;
+                    $insert_followup->want_help = $help;
+                    $insert_followup->query_remark = $query_remark;
+                    $insert_followup->last_remark = $last_remark;
+                    $insert_followup->recall_date = $recall_date;
+                    $insert_followup->recall_time = $recall_time;
+                    $insert_followup->call_start_time = $start_call_datetime;
+                    $insert_followup->call_end_time = $end_call_datetime;
+                    $insert_followup->created_at = $datetime;
+                    $insert_followup->save();
+
+
+                    $uploadLeadData = UploadLeads::whereId($lead_id)->first();
+                    $uploadLeadData->call_date = $recall_date;
+                    $uploadLeadData->call_time = $recall_time; 
+                    $uploadLeadData->appointment_date = NULL; 
+                    $uploadLeadData->appointment_time = NULL;
+                    $uploadLeadData->lead_status = $status; 
+                    $uploadLeadData->update();             
+                }
+
+                if($is_recall == "N")
+                {
+                    $status = 19;
+
+                    $recall_date = date("Y-m-d",strtotime("+30 days"));
+                    $recall_time = date("H:i:s",strtotime("11:00:00"));
+
+                    $added_for = $added_by;
+
+
+                    $getAllCRMs = LMGEmployee::where('designation', 18)->where('offinfo', 2)->select('empusrid')->orderBy('empusrid')->get();
+                    $empid = array_map(function($n) { 
+                        return $n['empusrid']; 
+                    }, $getAllCRMs->toArray());
+                    if(count($empid) > 1) {
+                        $getLastAssignedCRM = UploadLeads::whereNotNull('crm_id')->orderBy('added_datetime', 'DESC')->select('crm_id')->first();
+                        if(!is_null($getLastAssignedCRM)){
+                            $last_crm_id = $getLastAssignedCRM->crm_id;
+                            $added_for = $this->get_next($empid,$last_crm_id);
+                        } else {
+                            $added_for = $this->get_next($empid,$empid[0]);
+                        }
+                    } elseif (count($empid) == 1) {
+                        $added_for = $empid[0];
+                    } else {
+                        // NO Employee found having BDF designation THROW AN EXCEPTION HERE
+                    }
+                    $crm_id = $added_for;
+                    
+                    $insert_followup = new LeadFollowUp();
+                    $insert_followup->upload_lead_id = $lead_id;
+                    $insert_followup->followup_added_by = $added_by;
+                    $insert_followup->followup_added_for = $added_for;
+                    $insert_followup->previous_status = $previous_status;
+                    $insert_followup->current_status = $status;
+                    $insert_followup->is_person = $first_conf;
+                    $insert_followup->first_no_reason = $first_no_reason;
+                    $insert_followup->chat_now = $chat_now;
+                    $insert_followup->is_sell_online = $online_selling;
+                    $insert_followup->portal_name = $protal_name;
+                    $insert_followup->want_to_register = $register;
+                    $insert_followup->appointment_date = NULL;
+                    $insert_followup->appointment_time = NULL;
+                    $insert_followup->want_help = $help;
+                    $insert_followup->query_remark = $feedback_remarks;
+                    $insert_followup->last_remark = $last_remark;
+                    $insert_followup->recall_date = $recall_date;
+                    $insert_followup->recall_time = $recall_time;
+                    $insert_followup->call_start_time = $start_call_datetime;
+                    $insert_followup->call_end_time = $end_call_datetime;
+                    $insert_followup->created_at = $datetime;
+                    $insert_followup->save();
+
+
+                    $uploadLeadData = UploadLeads::whereId($lead_id)->first();
+                    $uploadLeadData->call_date = $recall_date;
+                    $uploadLeadData->call_time = $recall_time; 
+                    $uploadLeadData->appointment_date = NULL; 
+                    $uploadLeadData->appointment_time = NULL;
+                    $uploadLeadData->lead_status = $status; 
+                    $uploadLeadData->crm_id = $crm_id;
+                    $uploadLeadData->added_for = $crm_id;
+                    $uploadLeadData->update();   
+
+
+                }
+            }
+            Session::forget('timer');
+            Session::forget("redirecturl");
+            
+            DB::commit();
+            $status = "success";
+            $message = "Followup completed successfully.";
+            
+        }catch (Exception $e) {
+            $status = "error";
+            $message = "Unable to update the lead record as of now.".$e->getMessage();
+            DB::rollback();
+        }
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+            'icon' => $status,
+        ]);
+    }
+
+      //user defined function
+      function get_next($array, $key) {
+	
+        if (in_array($key, $array)){
+            $currentKey = current($array);
+            while ($currentKey !== null && $currentKey != $key) {
+               next($array);
+               $currentKey = current($array);
+            }
+            if(next($array) == ""){
+                return $array[0];
+            }else{
+                return current($array);
+            }
+        }else{
+          return $array[0];
+        }
+        
+    }
+
+    public function createSession(Request $request)
+    {
+        Session::put("timer", date('H:i:s'));
+        Session::put("redirecturl", $request['sucurl']);
+        return Session::get("timer");
     }
 }

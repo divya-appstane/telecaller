@@ -48,7 +48,11 @@
                                             <td class="text-center">{{$lead->getLeadCurrentStatus['status_name']}}</td>
                                             <td class="text-center">{{$lead->is_person == 'Y' ? "YES" : "NO"}}</td>
                                             <td class="text-center">{{$lead->want_to_register == 'Y' ? "YES" : "NO"}}</td>
-                                            <td class="text-center">{{date('dS M y', strtotime($lead->appointment_date))}}<br/>{{date('h:i A', strtotime($lead->appointment_time))}}</td>
+                                            <td class="text-center">
+                                                @if($lead->appointment_date != null && $lead->appointment_time != null)
+                                                    {{date('dS M y', strtotime($lead->appointment_date))}}<br/>{{date('h:i A', strtotime($lead->appointment_time))}}
+                                                @endif
+                                            </td>
                                             <td class="text-center">{{date('dS M y', strtotime($lead->recall_date))}}<br/>{{date('h:i A', strtotime($lead->recall_time))}}</td>
                                             <td class="text-center">{{html_entity_decode($lead->last_remark, ENT_QUOTES)}}</td>
                                             <td class="text-center"><a href="{{route('crm.leads.view.singleFollowUpsDetails', ['id' => base64_encode($lead->followup_id)])}}"><i class="icon-eye feather" style="font-size: 24px; font-weight:bold;"></i></a></td>

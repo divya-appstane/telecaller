@@ -24,7 +24,7 @@
             }
         </style>
     @endpush
-    <div class="content">
+    <div class="content" @if(Session::get("timer")) style="margin-left: 0% !important" @endif>
         <div class="main">
             <div class="page-header">
                 <h4 class="page-title"></h4>
@@ -33,7 +33,7 @@
                    <div class="breadcrumb-item"><a href="{{route(session()->get('load_dashboard').'.dashboard')}}"> Dashboard </a></div>
                    <div class="breadcrumb-item"><a href="javascript:void(0)"> Leads </a></div>
                    <div class="breadcrumb-item"><a href="{{route('telecaller.leads.view.allLeads')}}"> View all Leads </a></div>
-                   <div class="breadcrumb-item"><a href="{{route('telecaller.leads.view.leadCalledEngagementView', ['id' => base64_encode($single_lead->id)])}}"> Lead Call Engagement </a></div>
+                   <div class="breadcrumb-item"><a href="{{route('telecaller.leads.view.leadCalledEngagementView', ['id' => base64_encode($single_lead->id)]) }}"> Lead Call Engagement </a></div>
                 </div>
             </div>
             <div class="card">
@@ -43,7 +43,7 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingThree">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                    View Contact Details
+                                    View Contact Details 
                                 </button>
                             </h2>
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
@@ -107,6 +107,7 @@
                                                         @endforeach
                                                     @endif
                                                 </div>
+                                              
                                                 <div class="col-md-6">
                                                     <label for="gst_number" class="form-label">GST Number</label>
                                                     <input type="text" class="form-control" id="gst_number" name="gst_number" value="{{$single_lead->gst_number}}" placeholder="Enter your GST number">
@@ -668,6 +669,7 @@
                 });  
                     
             });
+
         </script>
     @endpush
 @endsection

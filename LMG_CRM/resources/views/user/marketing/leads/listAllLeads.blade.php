@@ -74,9 +74,13 @@
                                             <td class="text-center">{{date('d-m-Y H:i:s', strtotime($lead->appointment_date." ".$lead->appointment_time))}}</td>
                                             @if ($lead->lead_status == "6" || $lead->lead_status == "8")
                                                 <td>
-                                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#assignModal"  onclick="$('#assignModal_lead_id').val({{ $lead->id }})">
-                                                        <i class="icon-phone-call feather" style="font-size: 1.2rem;"></i>
-                                                    </button>
+                                                    {{-- @if($lead->call_date <= date('Y-m-d')) --}}
+                                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#assignModal"  onclick="$('#assignModal_lead_id').val({{ $lead->id }})">
+                                                            <i class="icon-phone-call feather" style="font-size: 1.2rem;"></i>
+                                                        </button>
+                                                    {{-- @else 
+                                                        <p class="text-center">-</p>
+                                                   @endif --}}
                                                 </td>
                                             @elseif ($lead->lead_status == "7")
                                                 <td class="text-center">
@@ -88,7 +92,7 @@
                                                 <td class="text-center"> - </td>
                                             @endif
                                             <td class="text-center"><a href="{{route('marketing.leads.view.single', ['id' => base64_encode($lead->id)])}}"><i class="icon-search feather" style="font-size: 20px; font-weight:bold;"></i></a></td>
-                                            <td class="text-center"><a href="{{route('marketing.leads.view.followUpsDetails', ['id' => base64_encode($lead->id)])}}""><i class="icon-list feather" style="font-size: 20px; font-weight:bold;"></i></a></td>
+                                            <td class="text-center"><a href="{{route('marketing.leads.view.followUpsDetails', ['id' => base64_encode($lead->id)])}}"><i class="icon-list feather" style="font-size: 20px; font-weight:bold;"></i></a></td>
                                         </tr>                                
                                     @endforeach
                                 @endif
@@ -113,6 +117,8 @@
                 </div>
             </div>
         </div>
+
+       
 
         <!-- MODEL START -->
         <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -359,34 +365,7 @@
                 },
             });
             
-            function update_meeting_status(){
-                
-                var form_data = $("#meetconfirm_form").serializeArray();
-                        
-                console.log(form_data);
-                
-                $.ajax({
-                    
-                    type: "POST",
-                    url: "save_sales_followup_step2.php",
-                    data: form_data,
-                    dataType: "JSON",
-                    success: function(data){
-                        console.log(data);
-                        if(data.status == "ok"){
-                            $("#followup_error_msg2").css("color","green");
-                            $("#followup_error_msg2").html(data.message);
-                            setTimeout(function(){ location.reload(); }, 2000);
-                            
-                        }else{
-                            $("#followup_error_msg2").css("color","red");
-                            $("#followup_error_msg2").html(data.message);
-                        }
-                    }
-                    
-                });
-
-            }
+          
         </script>
     @endpush
 @endsection

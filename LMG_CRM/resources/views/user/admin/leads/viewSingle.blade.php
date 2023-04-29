@@ -231,7 +231,7 @@
                                     showConfirmButton: false,
                                     showCancelButton: false,
                                     showCloseButton: false,
-                                    timer: 3000
+                                    timer: swalModelTimeOut
                                 });
                                 // if(response.status == 'success')
                                 //     $('.updateStatus').addClass('alert alert-success');
@@ -242,7 +242,7 @@
 
                                 setTimeout(() => {
                                     window.location.href = `{{route('admin.leads.view.allLeads')}}`;
-                                }, 4000);
+                                }, pageReloadTimeout);
                             },
                             error: function(data){
                                 if( data.status === 422 ) {

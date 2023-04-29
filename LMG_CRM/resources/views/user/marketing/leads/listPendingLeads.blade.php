@@ -59,9 +59,13 @@
                                     <td class="text-center">{{date('d-m-Y H:i:s', strtotime($lead->appointment_date." ".$lead->appointment_time))}}</td>
                                     @if ($lead->lead_status == "6" || $lead->lead_status == "8")
                                         <td>
-                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#assignModal"  onclick="$('#assignModal_lead_id').val({{ $lead->id }})">
-                                                <i class="icon-phone-call feather" style="font-size: 1.2rem;"></i>
-                                            </button>
+                                            {{-- @if($lead->call_date <= date('Y-m-d')) --}}
+                                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#assignModal"  onclick="$('#assignModal_lead_id').val({{ $lead->id }})">
+                                                    <i class="icon-phone-call feather" style="font-size: 1.2rem;"></i>
+                                                </button>
+                                             {{-- @else 
+                                                <p class="text-center">-</p>
+                                            @endif --}}
                                         </td>
                                     @elseif ($lead->lead_status == "7")
                                         <td class="text-center">
@@ -99,9 +103,70 @@
     </div>
 </div>
 
+ <!-- MODEL START -->
+ <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{ucwords(session()->get('load_dashboard'))}} Call</h5>
+            </div>
+            <div class="modal-body">
+                <form id="assignModal_form" name="assignModal_form" class="row g-2" novalidate autocomplete="off">
+                    @csrf
+                    <div class="col-md-6">
+                        <label for="assignStatus" class="form-label"><strong>Meeting confirm Status:</strong></label>
+                        <select id="assignStatus" name="assignStatus" class="form-select">
+                            <option value="" selected>Choose Status...</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-none" id="appstatus">
+                        <label for="appoitmentstatus" class="form-label"><strong>Reason (Why No?): </strong></label>
+                        <select name="appoitmentstatus" id="appoitmentstatus" class="form-select">
+                            <option value="" selected>Choose Reason...</option>
+                            <option value="new">New Appointment</option>
+                            <option value="cancel">Cancel</option>
+                        </select>
+                    </div>  
+                    <div class="col-md-12 d-none" id="appdate">
+                        <label for="recipient-name" class="form-label"><strong>Appointment date & time: </strong></label>
+                        <input type="text" name="appoinment_date" id="appoinment_date" value="" placeholder="Enter Date"  data-date-format="yyyy-mm-dd"  class="form-control datepicker">
+                        &nbsp;
+                        <input type="text" name="appoinment_time" id="appoinment_time" value="" class="form-control timepicker" placeholder="Time">
+                        <button type="button" class="form-control btn btn-danger mt-2" onclick="$('#appoinment_date').val('');$('#appoinment_time').val('');"  style="margin-bottom:10px;">Clear</button>
+                    </div>  
+        
+                    <div class="col-md-12 d-none" id="recalldate">
+                        <label for="recipient-name" class="form-label"><strong>Recall date & time: </strong></label>
+                        <input type="text" name="recall_date" id="recall_date" value="" placeholder="Enter Date"  data-date-format="yyyy-mm-dd"  class="form-control datepicker">
+                        &nbsp;
+                        <input type="text" name="recall_time" id="recall_time" value="" class="form-control timepicker" placeholder="Time">
+                        <button type="button" class="form-control btn btn-danger mt-2" onclick="$('#recall_date').val('');$('#recall_time').val('');"  style="margin-bottom:10px;">Clear</button>
+                    </div>
+                    
+                    <input type="hidden" id="assignModal_lead_id" name="assignModal_lead_id">
+                    
+                    <p id="followup_error_msg1" style="font-weight:bold;"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" name="btn-submit" id="btn-submit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODEL END -->
+
 @push('scripts')
 <script src="{{env('USER_ASSETS')}}vendors/datatables/jquery.dataTables.min.js"></script>
 <script src="{{env('USER_ASSETS')}}vendors/datatables/dataTables.bootstrap.min.js"></script>
+<script src="{{env('USER_ASSETS')}}vendors/jquery-validation/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/3.4.0/js/bootstrap-colorpicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/jquery-clockpicker.min.js"></script>
 <script>
     $('.data-table').DataTable({
         'columnDefs': [
@@ -109,6 +174,181 @@
         ],
         order: [[5, 'desc']],
     });
+
+    let start = new Date();
+    let end = new Date(new Date().setMonth(start.getMonth()+1))
+
+    $('#appoinment_date').datepicker({
+        autoHide: true,
+        inline: true,
+        format: 'yyyy-mm-dd',
+        startDate: start,
+        endDate: end
+    });
+    $('#recall_date').datepicker({
+        autoHide: true,
+        inline: true,
+        format: 'yyyy-mm-dd',
+        startDate: start,
+        endDate: end
+    });
+    $('#sappoinment_date').datepicker({
+        autoHide: true,
+        inline: true,
+        format: 'yyyy-mm-dd',
+        startDate: start,
+        endDate: end
+    });
+            
+    $('.timepicker').clockpicker({
+        autoclose: true
+    });
+
+    $( "#assignStatus" ).change(function() {
+        var metting = $("#assignStatus").val();
+        //alert(metting);
+        if(metting == 0){
+            $("#appstatus").removeClass('d-none');
+        }else{
+            $("#appstatus").addClass('d-none'); 
+            $("#appdate").addClass('d-none');
+            $("#recalldate").addClass('d-none');
+        }    
+    });
+    
+    $( "#selreg" ).change(function() {
+        var selreg = $("#selreg").val();
+        if(selreg == 0){
+            $("#notregreason").show();
+        }else{
+            $("#notregreason").hide();
+            $("#selappdate").hide();
+            $("#notregreasondata").hide();
+        } 
+    });
+    $( "#appoitmentstatus" ).change(function() {
+        var appoitmentstatus = $("#appoitmentstatus").val();
+        if(appoitmentstatus == "new"){
+            $("#appdate").removeClass('d-none');
+            $("#recalldate").addClass('d-none');
+        }else if(appoitmentstatus == 'cancel'){
+            $("#recalldate").removeClass('d-none');
+            $("#appdate").addClass('d-none');
+        }else if(appoitmentstatus == ''){
+            $("#recalldate").addClass('d-none');
+            $("#appdate").addClass('d-none');
+        }     
+    });
+
+    $( "#selreason" ).change(function() {
+        var selreason = $("#selreason").val();
+    
+        if(selreason == "newfollowup"){
+            $("#selappdate").removeClass('d-none');
+            $("#notregreasondata").addClass('d-none');
+        
+        }else if(selreason == "notintrested"){
+        
+            $("#selappdate").addClass('d-none');
+            $("#notregreasondata").removeClass('d-none');
+        }else if(selreason == ''){
+            $("#selappdate").addClass('d-none');
+            $("#notregreasondata").addClass('d-none');
+        }    
+    });
+    
+    $('#btn-submit').on('click', function(e) {
+        e.preventDefault();
+        const valid = $('#assignModal_form').valid();
+        if(valid) {
+            const form_data = $("#assignModal_form").serializeArray();
+            $.ajax({
+                type: "POST",
+                url: "{{route('marketing.leads.saveCallStatus')}}",
+                data: form_data,
+                dataType: "JSON",
+                success: function(response){
+                    $('#modal').modal('toggle');
+                    Swal.fire({
+                        title: response.status,
+                        text: response.message,
+                        icon: response.status,
+                        showConfirmButton: false,
+                        showCancelButton: false,
+                        showCloseButton: false,
+                        timer: swalModelTimeOut
+                    });
+
+                    setTimeout(() => {
+                        window.location.href = `{{route('marketing.leads.view.allLeads')}}`;
+                    }, pageReloadTimeOut);
+                }
+            });
+        } else {
+            console.log('invalid');
+        }
+    });
+
+    $('#assignModal_form').validate({
+        ignore: ".ignore",
+        debug: false,
+        errorElement: 'span',
+        rules:{
+            assignStatus: {
+                required: true,
+            },
+            appoitmentstatus: {
+                required: function (element) {
+                    return $('#assignStatus').val() != 1
+                }
+            },
+            appoinment_date: {
+                required: function (element) {
+                    return $('#appoitmentstatus').val() == 'new'
+                }
+            },
+            appoinment_time: {
+                required: function (element) {
+                    return $('#appoitmentstatus').val() == 'new'
+                }
+            },
+            recall_date: {
+                required: function (element) {
+                    return $('#appoitmentstatus').val() == 'cancel'
+                }                        
+            },
+            recall_time: {
+                required: function (element) {
+                    return $('#appoitmentstatus').val() == 'cancel'
+                }
+            },
+        },
+        messages: {
+            assignStatus: "You must select call status",
+            appoitmentstatus: "You must select appointment status",
+            appoinment_date: "You must select new appointment date",
+            appoinment_time: "You must select new appointment time",
+            recall_date: "You must select recall date",
+            recall_time: "You must select recall time",
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            // if(element.attr("name") == "cat_id[]") {
+            //     // console.log(element);
+            //     element.parent().append( error );
+            // } else {
+            //     error.insertAfter(element);
+            // }
+            error.insertAfter(element);
+        },
+    });
+    
+  
 </script>
 @endpush
 @endsection

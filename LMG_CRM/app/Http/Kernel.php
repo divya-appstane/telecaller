@@ -66,6 +66,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check_if_user_login' => \App\Http\Middleware\CheckLogin::class,
         'after_login_only' => \App\Http\Middleware\VerifyLoggedIn::class,
-        'rolepermission' => \App\Http\Middleware\RolePermissionMiddleware::class, 
+        'rolepermission' => \App\Http\Middleware\RolePermissionMiddleware::class,
+        'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class 
     ];
 }

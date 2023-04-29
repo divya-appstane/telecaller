@@ -163,58 +163,22 @@ input[type=number] {
                         </p>
                     </div>
                     <div class="col-md-3" id="feedback_form">
-                        <p>
-                            <strong><u>Feedback Form :</u></strong>
-                        </p>
-                        @php $i = 0;  @endphp
-                        @foreach($feedback_data as $fd)
-                        @php ++$i; @endphp
-                        <p>@php echo $i."."; @endphp &nbsp;&nbsp; {{ $fd->question }}</p>
-                        <p>
-                            @if($fd->question_type == "Yes/No")
-                            <label class="radio-inline">
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="Y" required /> Yes
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="N" required /> No
-                            </label>
-                            @elseif($fd->question_type == "Rating")
-                            <label class="radio-inline">
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="1" required> 1
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="2" required> 2
-                            </label>
-                            <label class="radio-inline">   
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="3" required> 3
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="4" required> 4
-                            </label>
-                            <label class="radio-inline">   
-                                <input type="radio" name="question_{{$fd->feedback_id}}" value="5" required> 5
-                            </label>
-                            @endif
-                            <textarea class="form-control" name="question_remark_{{$fd->feedback_id}}" rows="1" required placeholder="Feedback query @php echo $i; @endphp"></textarea>
-                        </p>
-                        @endforeach
-
+                        <textarea class="form-control" name="feedback_remarks" id="feedback_remarks"  placeholder="Feedback Remarks"></textarea>
                     </div>
 
                     <div class="col-md-3 mt-3" id="recall_datetime">
                         <p>Recall Date & Time:</p>
                         <p>
-                            <input type="text" name="recall_date" id="recall_date" class="form-control" required placeholder="Enter Recall Date here"  data-date-format="yyyy-mm-dd" required>
+                            <input type="text" name="recall_date" id="recall_date" class="form-control" placeholder="Enter Recall Date here"  data-date-format="yyyy-mm-dd" required>
                             &nbsp;
-                            <input type="text" name="recall_time" id="start_time" class="form-control timepicker" required placeholder="Enter Recall Time here" required>
+                            <input type="text" name="recall_time" id="start_time" class="form-control timepicker" placeholder="Enter Recall Time here" required>
                             &nbsp;
                             <button type="button" class="btn btn-danger m-3" onclick="$('#recall_date').val('');$('#start_time').val('');">Clear</button>
                         </p>
                     </div>
-                    <div class="row">
-                        <div id="final_remark">
-                            <textarea class="form-control" cols="20" rows="10" name="last_remark" id="last_remark" required placeholder="Final Remark"></textarea>
-                        </div>
+
+                    <div id="final_remark">
+                        <textarea class="form-control" cols="20" rows="10" name="last_remark" id="last_remark" placeholder="Final Remark"></textarea>
                     </div>
 
 
@@ -257,7 +221,6 @@ input[type=number] {
         $("#btn_sav").hide();
 
 
-
         $(document).on("click",".is_recall",function() {
             var is_recall = $(this).val();
 
@@ -289,7 +252,6 @@ input[type=number] {
         $(document).on("click","#reset-btn",function() {
             location.reload();
         });
-
 
         $(document).ready(function(){
             jQuery.validator.addMethod("phoneIND", function(contact_number, element) {
@@ -410,12 +372,11 @@ input[type=number] {
             });
         });
 
-
         $(document).ready(function(){
             $('#btn_sav').on('click', function() {
                 let ff = new FormData($('#followup_form')[0]);
                 $.ajax({
-                    url: "{{route('crm.leads.store.feedback')}}",
+                    url: "{{route('crm.leads.storeregister.feedbackregister')}}",
                     type: 'POST',
                     data: ff,
                     processData: false,
@@ -455,8 +416,6 @@ input[type=number] {
                 });
             });
         });
-
     </script>
-
     @endpush
     @endsection

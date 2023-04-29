@@ -2,22 +2,23 @@
 
 @section('main-section')
     @push('css')
-        <link href="{{env('USER_ASSETS')}}vendors/datatables/dataTables.bootstrap.min.css" rel="stylesheet">
+        <link href="{{ env('USER_ASSETS') }}vendors/datatables/dataTables.bootstrap.min.css" rel="stylesheet">
     @endpush
     <div class="content">
         <div class="main">
             <div class="page-header">
                 <h4 class="page-title"></h4>
                 <div class="breadcrumb">
-                   <span class="me-1 text-gray"><i class="feather icon-home"></i></span>
-                   <div class="breadcrumb-item"><a href="{{route(session()->get('load_dashboard').'.dashboard')}}"> Dashboard </a></div>
-                   <div class="breadcrumb-item"><a href="javascript:void(0)"> Leads </a></div>
-                   <div class="breadcrumb-item"><a href="{{route('crm.leads.view.allLeads')}}"> View all Leads </a></div>
+                    <span class="me-1 text-gray"><i class="feather icon-home"></i></span>
+                    <div class="breadcrumb-item"><a href="{{ route(session()->get('load_dashboard') . '.dashboard') }}">
+                            Dashboard </a></div>
+                    <div class="breadcrumb-item"><a href="javascript:void(0)"> Leads </a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('crm.leads.view.allLeads') }}"> View all Leads </a></div>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h4>All Leads {{"(".ucwords(session()->get('load_dashboard')).")"}}</h4>
+                    <h4>All Leads {{ '(' . ucwords(session()->get('load_dashboard')) . ')' }}</h4>
                     <div class="mt-4">
                         <table id="data-table" class="table data-table">
                             <thead>
@@ -33,66 +34,97 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(!is_null($all_leads))
+                                @if (!is_null($all_leads))
                                     @foreach ($all_leads as $lead)
                                         <tr>
-                                            <td>{{$lead->company_name}}</td>
-                                            <td>{{$lead->contact_per_name}}</td>
+                                            <td>{{ $lead->company_name }}</td>
+                                            <td>{{ $lead->contact_per_name }}</td>
                                             <td>
                                                 @if ($lead->lead_status == 1)
-                                                    <a href="tel:+91{{$lead->contact_number}}">{{$lead->contact_number}}</a>
+                                                    <a
+                                                        href="tel:+91{{ $lead->contact_number }}">{{ $lead->contact_number }}</a>
                                                 @else
-                                                    {{$lead->contact_number}}
+                                                    {{ $lead->contact_number }}
                                                 @endif
                                             </td>
-                                            <td>{{$lead->address}}</td>
-                                            <td>{{$lead->added_by}}</td>
-                                            <td class="text-center">{{$lead->getLeadStatus['status_name']}}</td>
-                                            @if ($lead->lead_status == "10" || $lead->lead_status == "12")
+                                            <td>{{ $lead->address }}</td>
+                                            <td>{{ $lead->added_by }}</td>
+                                            <td class="text-center">{{ $lead->getLeadStatus['status_name'] }}</td>
+                                            @if ($lead->lead_status == '10' || $lead->lead_status == '12')
                                                 <td class="text-center">
-                                                    <a href="{{route('crm.leads.view.feedbackCallView', ['id' => base64_encode($lead->id)])}}">
-                                                    {{-- <a class="timerclass" data-url="{{route('crm.leads.view.feedbackCallView', ['id' => base64_encode($lead->id)])}}"> --}}
-                                                        <i class="icon-phone-call feather"  style="font-size: 24px; font-weight:bold;"></i>
-                                                    </a>
-                                                </td>
-                                                
-                                            @elseif($lead->lead_status == "13" || $lead->lead_status == "14")
-                                                <td class="text-center">
-                                                    @if($lead->call_date >= date('Y-m-d') && $lead->call_time >= date('H:i:s'))
-                                                        <a href="{{route('crm.leads.view.feedbackCallViewStepTwo', ['id' => base64_encode($lead->id)])}}">
-                                                            <i class="icon-phone-call feather" style="font-size: 24px; font-weight:bold;"></i>
+                                                    {{-- @if ($lead->call_date <= date('Y-m-d')) --}}
+                                                        <a href="#" class="feedback1timer"
+                                                            data-id="@php echo time(); @endphp"
+                                                            data-action="{{ route('crm.leads.view.feedbackCallView', ['id' => base64_encode($lead->id)]) }}">
+                                                            <i class="icon-phone-call feather"
+                                                                style="font-size: 24px; font-weight:bold;"></i>
                                                         </a>
-                                                   @else 
+                                                    {{-- @else
                                                         <p class="text-center">-</p>
-                                                   @endif
+                                                    @endif --}}
                                                 </td>
-                                               
-                                            @elseif($lead->lead_status == "15" || $lead->lead_status == "16" || $lead->lead_status == "17")
+                                            @elseif($lead->lead_status == '13' || $lead->lead_status == '14')
                                                 <td class="text-center">
-                                                    @if($lead->call_date >= date('Y-m-d') && $lead->call_time >= date('H:i:s'))
-                                                        <a href="{{route('crm.leads.view.feedbackCallViewStepThree', ['id' => base64_encode($lead->id)])}}">
-                                                            <i class="icon-phone-call feather" style="font-size: 24px; font-weight:bold;"></i>
+                                                    {{-- @if ($lead->call_date <= date('Y-m-d')) --}}
+                                                        <a href="#" class="feedback2timer"
+                                                            data-id="@php echo time(); @endphp"
+                                                            data-action="{{ route('crm.leads.view.feedbackCallViewStepTwo', ['id' => base64_encode($lead->id)]) }}">
+                                                            <i class="icon-phone-call feather"
+                                                                style="font-size: 24px; font-weight:bold;"></i>
                                                         </a>
-                                                    @else
+                                                    {{-- @else
                                                         <p class="text-center">-</p>
-                                                    @endif
+                                                    @endif --}}
                                                 </td>
-                                               
-                                            @elseif($lead->lead_status == "11")
+                                            @elseif($lead->lead_status == '15' || $lead->lead_status == '16' || $lead->lead_status == '17')
                                                 <td class="text-center">
-                                                    <a href="{{route('crm.leads.view.feedbackCallViewNotIntersted', ['id' => base64_encode($lead->id)])}}">
-                                                        <i class="icon-phone-call feather" style="font-size: 24px; font-weight:bold;"></i>
-                                                    </a>
+                                                    {{-- @if ($lead->call_date <= date('Y-m-d')) --}}
+                                                        <a href="#" class="feedback3timer"
+                                                            data-id="@php echo time(); @endphp"
+                                                            data-action="{{ route('crm.leads.view.feedbackCallViewStepThree', ['id' => base64_encode($lead->id)]) }}">
+                                                            <i class="icon-phone-call feather"
+                                                                style="font-size: 24px; font-weight:bold;"></i>
+                                                        </a>
+                                                    {{-- @else
+                                                        <p class="text-center">-</p>
+                                                    @endif --}}
                                                 </td>
-                                                
+                                            @elseif($lead->lead_status == '19' || $lead->lead_status == '20')
+                                                <td class="text-center">
+                                                    {{-- @if ($lead->call_date <= date('Y-m-d')) --}}
+                                                        <a href="#" class="feedbackintersted"
+                                                            data-id="@php echo time(); @endphp"
+                                                            data-action="{{ route('crm.leads.view.feedbackCallViewRegister', ['id' => base64_encode($lead->id)]) }}">
+                                                            <i class="icon-phone-call feather"
+                                                                style="font-size: 24px; font-weight:bold;"></i>
+                                                        </a>
+                                                    {{-- @else
+                                                        <p class="text-center">-</p>
+                                                    @endif --}}
+                                                </td>
+                                            @elseif($lead->lead_status == '11' || $lead->lead_status == '18')
+                                                <td class="text-center">
+                                                    {{-- @if ($lead->call_date <= date('Y-m-d')) --}}
+                                                        <a href="#" class="feedbacknotintersted"
+                                                            data-id="@php echo time(); @endphp"
+                                                            data-action="{{ route('crm.leads.view.feedbackCallViewNotIntersted', ['id' => base64_encode($lead->id)]) }}">
+                                                            <i class="icon-phone-call feather"
+                                                                style="font-size: 24px; font-weight:bold;"></i>
+                                                        </a>
+                                                    {{-- @else
+                                                        <p class="text-center">-</p>
+                                                    @endif --}}
+                                                </td>
                                             @else
                                                 <td class="text-center"> - </td>
                                             @endif
                                             <td class="text-center">
-                                                <a href="{{route('crm.leads.view.followUpsDetails', ['id' => base64_encode($lead->id)])}}"><i class="icon-list feather" style="font-size: 24px; font-weight:bold;"></i>
+                                                <a href="{{ route('crm.leads.view.followUpsDetails', ['id' => base64_encode($lead->id)]) }}"><i
+                                                        class="icon-list feather"
+                                                        style="font-size: 24px; font-weight:bold;"></i>
                                                 </a>
                                             </td>
-                                        </tr>                                
+                                        </tr>
                                     @endforeach
                                 @endif
                             </tbody>
@@ -114,79 +146,149 @@
             </div>
         </div>
 
-    @push('scripts')
-        <script src="{{env('USER_ASSETS')}}vendors/datatables/jquery.dataTables.min.js"></script>
-        <script src="{{env('USER_ASSETS')}}vendors/datatables/dataTables.bootstrap.min.js"></script>
-        <script>
-            $('.data-table').DataTable({
-                'columnDefs': [
-                    { 'orderable': false, 'targets': 0 }
-                ],
-                order: [[5, 'desc']],
-            });
-        </script>
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $(".timerclass").click(function(){
-                    var hours =0;
-                    var mins =0;
-                    var seconds =0;
-                    startTimer();
+        @push('scripts')
+            <script src="{{ env('USER_ASSETS') }}vendors/datatables/jquery.dataTables.min.js"></script>
+            <script src="{{ env('USER_ASSETS') }}vendors/datatables/dataTables.bootstrap.min.js"></script>
+            <script>
+                $('.data-table').DataTable({
+                    'columnDefs': [{
+                        'orderable': false,
+                        'targets': 0
+                    }],
+                    order: [
+                        [5, 'desc']
+                    ],
+                });
+            </script>
 
-                function startTimer()
-                {
-                    timex = setTimeout(function(){
-                        seconds++;
-                        if(seconds >59)
-                        {
-                            seconds=0;
-                            mins++;
-                            if(mins>59) 
-                            {
-                                mins=0;
-                                hours++;
-                                if(hours <10) 
-                                {
-                                    $("#hours").text('0'+hours+':');
-                                } 
-                                else 
-                                {
-                                    $("#hours").text(hours+':');
-                                }
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $(".feedback1timer").click(function() {
+                        var starttime = $(this).data('id');
+                        var sucurl = $(this).data('action');
+                        var url = "{{ route('crm.leads.store.createSession') }}";
+
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }
-                                
-                            if(mins<10)
-                            {                     
-                                $("#mins").text('0'+mins+':');
-                            }       
-                            else 
-                            {
-                                $("#mins").text(mins+':');
+                        });
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: {
+                                "sucurl": sucurl
+                            },
+                            success: function(response) {
+                                elem = document.getElementById('timer').innerHTML;
+                                window.location.href = sucurl;
+
+                                setInterval(cntDown, 1000);
                             }
-                        }    
-                        if(seconds <10) 
-                        {
-                            $("#seconds").text('0'+seconds);
-                        } 
-                        else 
-                        {
-                            $("#seconds").text(seconds);
-                        }
-                    startTimer();
-                        },1000);
-                    }
-                    var url = $(this).data("url");
-                    $.ajax({
-                        type:'GET',
-                        url: "{{route('crm.leads.store.createSession')}}",
-                        contentType: false,
-                        processData: false,
-                        success:function(data){
-                            window.location.href= url;
-                        }
+                        });
+                    });
+
+
+                    $(".feedback2timer").click(function() {
+                        var starttime = $(this).data('id');
+                        var sucurl = $(this).data('action');
+                        var url = "{{ route('crm.leads.store.createSession') }}";
+
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: {
+                                "sucurl": sucurl
+                            },
+                            success: function(response) {
+                                elem = document.getElementById('timer').innerHTML;
+                                window.location.href = sucurl;
+
+                                setInterval(cntDown, 1000);
+                            }
+                        });
+                    });
+
+                    $(".feedback3timer").click(function() {
+                        var starttime = $(this).data('id');
+                        var sucurl = $(this).data('action');
+                        var url = "{{ route('crm.leads.store.createSession') }}";
+
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: {
+                                "sucurl": sucurl
+                            },
+                            success: function(response) {
+                                elem = document.getElementById('timer').innerHTML;
+                                window.location.href = sucurl;
+
+                                setInterval(cntDown, 1000);
+                            }
+                        });
+                    });
+
+                    $(".feedbackintersted").click(function() {
+                        var starttime = $(this).data('id');
+                        var sucurl = $(this).data('action');
+                        var url = "{{ route('crm.leads.store.createSession') }}";
+
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: {
+                                "sucurl": sucurl
+                            },
+                            success: function(response) {
+                                elem = document.getElementById('timer').innerHTML;
+                                window.location.href = sucurl;
+
+                                setInterval(cntDown, 1000);
+                            }
+                        });
+                    });
+
+                    $(".feedbacknotintersted").click(function() {
+                        var starttime = $(this).data('id');
+                        var sucurl = $(this).data('action');
+                        var url = "{{ route('crm.leads.store.createSession') }}";
+
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: {
+                                "sucurl": sucurl
+                            },
+                            success: function(response) {
+                                elem = document.getElementById('timer').innerHTML;
+                                window.location.href = sucurl;
+
+                                setInterval(cntDown, 1000);
+                            }
+                        });
                     });
                 });
-            });
-        </script>
-    @endpush
-@endsection
+            </script>
+        @endpush
+    @endsection

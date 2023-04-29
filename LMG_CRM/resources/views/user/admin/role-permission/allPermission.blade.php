@@ -36,33 +36,18 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
-                                        {{-- @foreach($all_module as $module)
-                                            <tr>
-                                                <td>{{$module->name}}</td>
-                                                    @foreach($all_permissions as $permissions)
-                                                    <td>
-                                                        @foreach($permissions->permissionActions as $permaction)
-                                                            @foreach($module->modulePermissions as $modpermission)
-                                                                @if($modpermission->permission_id == $permaction->id  && $permissions->id == $permaction->action_id)
-                                                                    <input type="checkbox">{{$permaction->name}}
-                                                                @endif
-                                                            @endforeach
-                                                        @endforeach
-                                                    </td>
-                                                @endforeach
-                                            <tr>
-                                        @endforeach --}}
                                         <input type="hidden" value="{{$role->designation_id}}" name="designation_designation_id" id="designation_designation_id">
 
+                                       
                                         @foreach($all_module as $module)
                                             <tr>
                                                 <th>{{$module->name}}</th>
                                                 @foreach($all_permissions as $permission)
                                                     <td>
+                                                       
                                                         @foreach($module->modulePermissions as $modpermission)
+                                                       
                                                             @if($modpermission->module_id == $module->id && $permission->id == $modpermission->action_id)
-                                                            
                                                                     <input type="checkbox" value="{{$modpermission->id}}" name="permission_id[]" id="permission_id" 
                                                                         @foreach($chkpermission as $permissionss)
                                                                             @if($permissionss->designation_designation_id == $role->designation_id && $modpermission->id ==$permissionss->permission_id)
@@ -70,12 +55,6 @@
                                                                             @endif
                                                                         @endforeach
                                                                     >
-
-                                                                    {{-- @foreach($chkpermission as $permissionss)
-                                                                        @if($permissionss->designation_designation_id == $role->designation_id && $modpermission->id ==$permissionss->permission_id)
-                                                                        <input type="hidden" value="{{$permissionss->id}}" name="rolepermissionid[]" id="rolepermissionid">
-                                                                        @endif
-                                                                    @endforeach  --}}
                                                                
                                                             @endif
                                                         @endforeach
